@@ -22,29 +22,24 @@ public class Morpion extends MorpionBase {
         int ligne = (position - 1) / 3;
         int colonne = (position - 1) % 3;
 
-        // Vérifier si la case est libre
         if (grille[ligne][colonne].equals("X") || grille[ligne][colonne].equals("O")) {
             return false;
         }
 
-        // Placer le symbole du joueur
         grille[ligne][colonne] = joueurActuel;
 
-        // Vérifier si le joueur a gagné
         if (verifierVictoire()) {
             jeuTermine = true;
             gagnant = joueurActuel;
             return true;
         }
 
-        // Vérifier match nul
         if (verifierMatchNul()) {
             jeuTermine = true;
             gagnant = "MATCH NUL";
             return true;
         }
 
-        // Changer de joueur
         joueurActuel = joueurActuel.equals("X") ? "O" : "X";
         return true;
     }
@@ -54,21 +49,18 @@ public class Morpion extends MorpionBase {
      * @return true si victoire détectée
      */
     private boolean verifierVictoire() {
-        // Vérifier les lignes
         for (int i = 0; i < 3; i++) {
             if (grille[i][0].equals(grille[i][1]) && grille[i][1].equals(grille[i][2])) {
                 return true;
             }
         }
 
-        // Vérifier les colonnes
         for (int j = 0; j < 3; j++) {
             if (grille[0][j].equals(grille[1][j]) && grille[1][j].equals(grille[2][j])) {
                 return true;
             }
         }
 
-        // Vérifier les diagonales
         if (grille[0][0].equals(grille[1][1]) && grille[1][1].equals(grille[2][2])) {
             return true;
         }
