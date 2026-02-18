@@ -1,14 +1,16 @@
 package miniprojet.Serveurs;
 import java.io.Serializable;
 
-// Classe de base du Morpion pour le client.
-
 public class MorpionBase implements Serializable{
 
     protected String[][] grille;
     protected String joueurActuel;
     protected boolean jeuTermine;
     protected String gagnant;
+
+    private static final String ROUGE = "\u001B[31m";
+    private static final String BLEU = "\u001B[34m";
+    private static final String RESET = "\u001B[0m";
 
     public MorpionBase() {
         grille = new String[3][3];
@@ -38,7 +40,17 @@ public class MorpionBase implements Serializable{
         for (int i = 0; i < 3; i++) {
             sb.append(" ");
             for (int j = 0; j < 3; j++) {
-                sb.append(grille[i][j]);
+
+                String valeur = grille[i][j];
+
+                if ("X".equals(valeur)) {
+                    sb.append(ROUGE).append("X").append(RESET);
+                } else if ("O".equals(valeur)) {
+                    sb.append(BLEU).append("O").append(RESET);
+                } else {
+                    sb.append(valeur);
+                }
+
                 if (j < 2) {
                     sb.append(" | ");
                 }

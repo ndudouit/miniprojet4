@@ -1,20 +1,10 @@
 package miniprojet.Serveurs;
 
-
-//Classe Morpion pour le serveur.
-
 public class Morpion extends MorpionBase {
 
     public Morpion() {
         super();
     }
-
-
-    final String VERT = "\u001B[32m"; // Lettre bien placée
-    final String JAUNE = "\u001B[33m"; // Lettre mal placée
-    final String RESET = "\u001B[0m"; // Retour couleur par défaut
-
-    private couleur = RESET;
 
     /**
      * Joue un coup à la position indiquée
@@ -22,9 +12,6 @@ public class Morpion extends MorpionBase {
      * @return true si le coup a été joué avec succès
      */
     public boolean jouerCoup(int position) {
-
-
-
 
         if (jeuTermine || position < 1 || position > 9) {
             return false;
@@ -37,9 +24,7 @@ public class Morpion extends MorpionBase {
             return false;
         }
 
-        couleur = joueurActuel.equals("X") ? VERT : JAUNE;
-
-        grille[ligne][colonne] = couleur + joueurActuel + RESET;
+        grille[ligne][colonne] = joueurActuel;
 
         if (verifierVictoire()) {
             jeuTermine = true;
