@@ -5,12 +5,12 @@ import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class Skeleton {
+public class ServeurJeu {
     
     public void demarrer(int portJeu) {
         try {
             ServerSocket serverSocket = new ServerSocket(portJeu);
-            System.out.println("Skeleton prêt sur le port " + portJeu + ".");
+            System.out.println("ServeurJeu prêt sur le port " + portJeu + ".");
             System.out.println("En attente de la connexion des 2 joueurs...");
             Socket s1 = serverSocket.accept();
             ObjectOutputStream out1 = new ObjectOutputStream(s1.getOutputStream());
@@ -45,11 +45,11 @@ public class Skeleton {
             System.out.println("Partie terminée, connexions fermées.");
 
         } catch (Exception e) {
-            System.err.println("Erreur réseau sur le Skeleton : " + e.getMessage());
+            System.err.println("Erreur réseau sur le ServeurJeu : " + e.getMessage());
         }
     }
 
     public static void main(String[] args) {
-        new Skeleton().demarrer(5200);
+        new ServeurJeu().demarrer(5200);
     }
 }
