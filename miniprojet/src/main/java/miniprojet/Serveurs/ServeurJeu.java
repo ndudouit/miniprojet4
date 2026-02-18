@@ -31,102 +31,56 @@ public class ServeurJeu {
     }
 
     private void gererPartie(ServeurTCP jeu) throws Exception {
+        System.out.println("Nouvelle partie démarrée");
+
         Object signal = jeu.recevoir(); // START
+        System.out.println("Signal reçu: " + signal);
 
-        ClientTCP clientDico = new ClientTCP("127.0.0.1", 5001);
-        String motSecret = (String) clientDico.receive();
-        clientDico.close();
-        
-        motSecret = motSecret.toUpperCase();
-        int taille = motSecret.length();
-        char premiereLettre = motSecret.charAt(0);
+        Morpion morpionServeur = new Morpion();
 
-        StringBuilder indiceDepart = new StringBuilder();
-        indiceDepart.append(premiereLettre);
-        for (int i = 1; i < taille; i++) indiceDepart.append("_");
-        
-        jeu.envoyer(indiceDepart.toString());
+        jeu.envoyer(morpionServeur.affichage());
 
-        int scoreMax = 600;
-        int scoreFinalCalcul = 0; // Variable pour stocker le score final (victoire ou défaite)
-        boolean gagne = false;
+        while (!morpionServeur.estTermine()) {
+            Object coupObj = jeu.recevoir();
 
-        for (int essai = 1; essai <= 6; essai++) {
-            String tentative = (String) jeu.recevoir();
-            if (tentative == null) break; 
-            tentative = tentative.toUpperCase();
-
-            if (tentative.length() != taille) {
-                jeu.envoyer("TAILLE_INCORRECTE:Le mot doit faire " + taille + " lettres.");
-                essai--;
-                continue;
+            if (coupObj == null) {
+                System.out.println("Client déconnecté");
+                break;
             }
 
-            char[] resultat = new char[taille];
-            boolean[] lettreMotSecretUtilisee = new boolean[taille];
-            boolean[] lettreTentativeTraitee = new boolean[taille];
+            String coup = coupObj.toString();
+            System.out.println("Coup reçu: " + coup);
 
-            // 1. Bien placé (Majuscule)
-            for (int i = 0; i < taille; i++) {
-                if (tentative.charAt(i) == motSecret.charAt(i)) {
-                    resultat[i] = tentative.charAt(i);
-                    lettreMotSecretUtilisee[i] = true;
-                    lettreTentativeTraitee[i] = true;
-                } else {
-                    resultat[i] = '_';
-                }
-            }
+            try {
+                int position = Integer.parseInt(coup);
+                boolean coupValide = morpionServeur.jouerCoup(position);
 
-            // 2. Mal placé (Minuscule)
-            for (int i = 0; i < taille; i++) {
-                if (lettreTentativeTraitee[i]) continue;
+                if (coupValide) {
+                    jeu.envoyer("OK");
+                    jeu.envoyer(morpionServeur.affichage());
+                    jeu.envoyer(morpionServeur.getEtatJeu());
 
-                char c = tentative.charAt(i);
-                boolean trouveMalPlace = false;
-                for (int j = 0; j < taille; j++) {
-                    if (!lettreMotSecretUtilisee[j] && motSecret.charAt(j) == c) {
-                        resultat[i] = Character.toLowerCase(c);
-                        lettreMotSecretUtilisee[j] = true;
-                        trouveMalPlace = true;
+                    if (morpionServeur.estTermine()) {
+                        jeu.envoyer("FIN");
+                        if (morpionServeur.getGagnant().equals("MATCH NUL")) {
+                            jeu.envoyer("Match nul !");
+                        } else {
+                            jeu.envoyer("Le joueur " + morpionServeur.getGagnant() + " a gagné !");
+                        }
+                        System.out.println("Partie terminée: " + morpionServeur.getEtatJeu());
                         break;
                     }
-                }
-                if (!trouveMalPlace) {
-                    resultat[i] = '_';
-                }
-            }
-
-            String reponse = new String(resultat);
-            
-            if (motSecret.equals(tentative)) {
-                scoreFinalCalcul = scoreMax; // Score total si gagné
-                jeu.envoyer("WIN:" + scoreFinalCalcul);
-                gagne = true;
-                break;
-            } else {
-                scoreMax -= 100;
-                if (essai == 6) {
-                    // Calcul des points de consolation sur la DERNIÈRE tentative
-                    int scoreDefaite = 0;
-                    for (char c : resultat) {
-                        if (Character.isUpperCase(c)) scoreDefaite += 10;
-                        else if (Character.isLowerCase(c)) scoreDefaite += 5;
-                    }
-                    scoreFinalCalcul = scoreDefaite; // On sauvegarde ce score pour l'envoi au serveur
-                    jeu.envoyer("LOSE:" + motSecret + ":" + scoreFinalCalcul);
                 } else {
-                    jeu.envoyer("CONTINUE:" + reponse);
+                    // Coup invalide
+                    jeu.envoyer("INVALIDE");
+                    jeu.envoyer("Coup invalide ! Veuillez réessayer.");
                 }
+            } catch (NumberFormatException e) {
+                jeu.envoyer("INVALIDE");
+                jeu.envoyer("Entrée invalide ! Veuillez entrer un nombre entre 1 et 9.");
             }
         }
-    
-        try {
-            ClientTCP clientScore = new ClientTCP("127.0.0.1", 5003);
-            clientScore.send(new ServeurScores.ScoreEntry("Joueur_" + System.currentTimeMillis(), scoreFinalCalcul));
-            clientScore.receive();
-            clientScore.close();
-        } catch(Exception e) {
-            System.err.println("Erreur envoi score: " + e.getMessage());
-        }
+
+        System.out.println("Partie terminée");
     }
 }
