@@ -9,12 +9,23 @@ public class Morpion extends MorpionBase {
         super();
     }
 
+
+    final String VERT = "\u001B[32m"; // Lettre bien placée
+    final String JAUNE = "\u001B[33m"; // Lettre mal placée
+    final String RESET = "\u001B[0m"; // Retour couleur par défaut
+
+    private couleur = RESET;
+
     /**
      * Joue un coup à la position indiquée
      * @param position Position de 1 à 9
      * @return true si le coup a été joué avec succès
      */
     public boolean jouerCoup(int position) {
+
+
+
+
         if (jeuTermine || position < 1 || position > 9) {
             return false;
         }
@@ -26,7 +37,9 @@ public class Morpion extends MorpionBase {
             return false;
         }
 
-        grille[ligne][colonne] = joueurActuel;
+        couleur = joueurActuel.equals("X") ? VERT : JAUNE;
+
+        grille[ligne][colonne] = couleur + joueurActuel + RESET;
 
         if (verifierVictoire()) {
             jeuTermine = true;
