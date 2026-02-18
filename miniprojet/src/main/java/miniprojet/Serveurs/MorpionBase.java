@@ -1,8 +1,9 @@
 package miniprojet.Serveurs;
+import java.io.Serializable;
 
 // Classe de base du Morpion pour le client.
 
-public class MorpionBase {
+public class MorpionBase implements Serializable{
 
     protected String[][] grille;
     protected String joueurActuel;
