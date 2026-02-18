@@ -1,8 +1,8 @@
 package miniprojet;
 
-import miniprojet.Global.Obj.ClientTCP;
-import miniprojet.Global.Serveur.Middleware;
-import miniprojet.Global.Serveur.ServeurJeu;
+import miniprojet.Serveurs.ClientTCP;
+import miniprojet.Serveurs.Middleware;
+import miniprojet.Serveurs.ServeurJeu;
 import miniprojet.Serveurs.ServeurDictionnaire;
 import miniprojet.Serveurs.ServeurNoms;
 import miniprojet.Serveurs.ServeurScores;
@@ -36,7 +36,6 @@ public class TestGlobal {
         lancerClientRobot();
     }
 
-    /
     private static void lancerService(String nom, Runnable service) {
         new Thread(() -> {
             try {
